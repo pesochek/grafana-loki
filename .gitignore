@@ -1,0 +1,13 @@
+.idea/
+.vim/
+.env
+
+grafana-config/**
+grafana-data/**
+loki-config/**
+ssl/**
+
+!ssl/.gitkeep
+
+docker-compose.override.yml
+nginx/grafana.conf

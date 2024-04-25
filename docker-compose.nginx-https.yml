@@ -1,0 +1,15 @@
+version: "3"
+
+services:
+  nginx:
+    depends_on:
+      - grafana
+      - loki
+    image: "nginx:1.25.5-alpine"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "./nginx/grafana.conf:/etc/nginx/conf.d/grafana.conf"
+      - "./ssl/archive/${SSL_DOMAIN_NAME}:/etc/ssl/archive/${SSL_DOMAIN_NAME}"
+      - "./ssl/live/${SSL_DOMAIN_NAME}:/etc/ssl/live/${SSL_DOMAIN_NAME}"

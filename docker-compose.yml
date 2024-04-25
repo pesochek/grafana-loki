@@ -1,0 +1,21 @@
+version: "3"
+
+services:
+  loki:
+    command: "-config.file=/etc/loki/local-config.yaml"
+    container_name: "loki"
+    image: "grafana/loki:main-da8ee7e"
+    ports:
+      - "${LOKI_PORT:-3100}:3100"
+
+  grafana:
+    container_name: "grafana"
+    depends_on:
+      - loki
+    environment:
+      GF_SERVER_ENABLE_GZIP: "true"
+    image: "grafana/grafana:10.4.2-ubuntu"
+    ports:
+      - "${GRAFANA_PORT:-3000}:3000"
+    volumes:
+      - "./grafana-data:/var/lib/grafana"
