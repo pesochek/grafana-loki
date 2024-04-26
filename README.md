@@ -118,3 +118,16 @@ that's how your Nginx is configured.
 ```bash
 bash ./run.sh --mode=nginx-external
 ```
+
+## IP whitelisting for Loki push endpoint in Nginx
+
+If you're running Grafana and Loki behind Nginx, you might want to restrict
+access to the Loki push endpoint. This can be done by adding the following
+variable to the `.env` file:
+
+```bash
+LOKI_IP_WHITELIST=127.0.0.1,127.0.0.2
+```
+
+Several addresses can be specified separated by a comma. IP subnets can be
+specified as well ([more details](https://nginx.org/en/docs/http/ngx_http_access_module.html#allow)).

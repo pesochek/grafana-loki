@@ -10,7 +10,9 @@ SSL_CERT_DIR="$(dirname "$0")/ssl"
 # If we are running on Windows in MINGW64,
 # we need to convert the path to a Windows path
 if [ "msys" = "${OSTYPE}" ]; then
-	SSL_CERT_DIR=$(cd ${SSL_CERT_DIR} ; pwd -W)
+	SSL_CERT_DIR=$(cd "${SSL_CERT_DIR}" ; pwd -W)
+else
+  SSL_CERT_DIR=$(realpath "${SSL_CERT_DIR}")
 fi
 
 if [ -f ".env" ]; then
@@ -21,6 +23,7 @@ if [ -f ".env" ]; then
     VAR_NAME_TRIMMED=$(echo -e "${var_name}" | tr -d '[:space:]')
     if [[ ! -z "${VAR_VALUE_TRIMMED}" ]] && [[ "#" != "${VAR_NAME_TRIMMED:0:1}" ]]; then
       DOCKER_ENV="${DOCKER_ENV} -e ${VAR_NAME_TRIMMED}=${VAR_VALUE_TRIMMED}"
+      export ${VAR_NAME_TRIMMED}="${VAR_VALUE_TRIMMED}"
     fi
   done < .env
 fi

@@ -56,6 +56,21 @@ generate_nginx_vhost_config() {
     -e "s#LOKI_PORT#${LOKI_PORT}#g" \
     -e "s#GRAFANA_PORT#${GRAFANA_PORT}#g" \
     nginx/grafana.conf
+
+  ALLOWED_IPS=""
+
+  IFS="," read -r -a IPS <<< "${LOKI_IP_WHITELIST}"
+
+  for ip in "${IPS[@]}"; do
+    echo "Will allow this IP: ${ip}"
+    ALLOWED_IPS="${ALLOWED_IPS}\nallow ${ip};"
+  done
+
+  if [ -n "${ALLOWED_IPS}" ]; then
+    ALLOWED_IPS="${ALLOWED_IPS}\ndeny all;"
+  fi
+
+  sed -i -e "s/#LOKI_IP_WHITELIST/${ALLOWED_IPS}/g" nginx/grafana.conf
 }
 
 case "${MODE}" in
@@ -91,7 +106,11 @@ case "${MODE}" in
 
     generate_nginx_vhost_config
 
-    mkdir -p /etc/ssl/live/${SSL_DOMAIN_NAME}
+    mkdir -p \
+      /etc/ssl/archive/${SSL_DOMAIN_NAME} \
+      /etc/ssl/live/${SSL_DOMAIN_NAME}
+
+    cp -rf ssl/archive/${SSL_DOMAIN_NAME}/* /etc/ssl/archive/${SSL_DOMAIN_NAME}/
     cp -rf ssl/live/${SSL_DOMAIN_NAME}/* /etc/ssl/live/${SSL_DOMAIN_NAME}/
     cp nginx/grafana.conf ${NGINX_EXTERNAL_FOLDER}/
 
